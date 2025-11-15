@@ -18,4 +18,7 @@
 #define TRIGGERS_ADDR 2
 #define NOTHING_ADDR 3
 
+#define LED_RED_PIN 4
+#define LED_GREEN_PIN 5
+#define LED_BLUE_PIN 6
 #endif //__HARDWARE_CONFIG_H__
