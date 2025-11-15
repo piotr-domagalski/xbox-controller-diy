@@ -9,7 +9,7 @@ compile: build
 	make -C build
 
 build:
-	cmake -DPICO_BOARD=pico2 -S . -B ${BUILD_DIR}
+	cmake -DPICO_BOARD=pico -S . -B ${BUILD_DIR}
 
 monitor:
 	picocom /dev/ttyACM0

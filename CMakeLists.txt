@@ -4,14 +4,14 @@ cmake_minimum_required(VERSION 3.13...3.27)
 # note: this must happen before project()
 include(/usr/share/pico-sdk/external/pico_sdk_import.cmake)
 
-project(main CXX C ASM)
+project(xbox_controller CXX C ASM)
 
 # initialize the Raspberry Pi Pico SDK
 pico_sdk_init()
 
 # rest of your project
 add_executable(main
-    main.c
+    main.c axes.c
 )
 
 #enable serial via usb and uart
