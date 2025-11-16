@@ -9,6 +9,8 @@
 inline double _adc_i2d(uint16_t adc);
 void _put_axis_addr(int addr);
 inline void _put_axis_addr_sleep(int addr);
+void _axes_swap(uint16_t *a, uint16_t *b);
+void _axes_invert(uint16_t *a);
 
 void axes_init() {
     adc_init();
@@ -49,6 +51,18 @@ axes_data_uint16_t read_axes() {
     return raw;
 }
 
+void axes_data_conv(axes_data_uint16_t *axes_data, axes_conv_flags_t flags) {
+    if (flags & AXES_CONV_SWAP_L) { _axes_swap(&axes_data->LX, &axes_data->LY); }
+    if (flags & AXES_CONV_INV_LX) { _axes_invert(&axes_data->LX); }
+    if (flags & AXES_CONV_INV_LY) { _axes_invert(&axes_data->LY); }
+    if (flags & AXES_CONV_SWAP_R) { _axes_swap(&axes_data->RX, &axes_data->RY); }
+    if (flags & AXES_CONV_INV_RX) { _axes_invert(&axes_data->RX); }
+    if (flags & AXES_CONV_INV_RY) { _axes_invert(&axes_data->RY); }
+    if (flags & AXES_CONV_SWAP_T) { _axes_swap(&axes_data->LT, &axes_data->RT); }
+    if (flags & AXES_CONV_INV_LT) { _axes_invert(&axes_data->LT); }
+    if (flags & AXES_CONV_INV_RT) { _axes_invert(&axes_data->RT); }
+}
+
 axes_data_double_t axes_uint16_to_double(axes_data_uint16_t *axes_raw) {
     axes_data_double_t axes;
     axes.LX = _adc_i2d(axes_raw->LX);
@@ -72,6 +86,15 @@ void _put_axis_addr(int addr) {
 inline void _put_axis_addr_sleep(int addr) {
     _put_axis_addr(addr);
     sleep_us(AXIS_SEL_ADDR_DELAY_US);
+}
+
+inline void _axes_swap(uint16_t *a, uint16_t *b) {
+    uint16_t temp = *a;
+    *a = *b;
+    *b = temp;
+}
+inline void _axes_invert(uint16_t *a) {
+    *a = ADC_MAX-(*a);
 }
 
 int sprint_axes_raw(char *buf, axes_data_uint16_t *axes_raw) {

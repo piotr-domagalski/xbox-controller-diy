@@ -6,7 +6,7 @@
 
 ## hardware-side code
 - RGB LED lib
-- analog axes swap, invert, scale (for triggers)
+- analog axes scale (for triggers)
 - button debouncing (maybe, if no hardware debouncing) - PIO or IRQs
 - ...
 
@@ -19,5 +19,6 @@
 - analog axes read
 
 ## hardware-side code
+- analog axes swap & invert
 
 ## software-side code
