@@ -10,8 +10,8 @@ inline double adc_i2d(uint16_t adc) {
     return ((double)(adc-(ADC_MAX/2)))/(ADC_MAX/2);
 }
 
-axes_t axes_raw_to_scaled(axes_raw_t *axes_raw) {
-    axes_t axes;
+axes_data_double_t axes_uint16_to_double(axes_data_uint16_t *axes_raw) {
+    axes_data_double_t axes;
     axes.LX = adc_i2d(axes_raw->LX);
     axes.LY = adc_i2d(axes_raw->LY);
     axes.RX = adc_i2d(axes_raw->RX);
@@ -21,7 +21,7 @@ axes_t axes_raw_to_scaled(axes_raw_t *axes_raw) {
     return axes;
 }
 
-int sprint_axes_raw(char *buf, axes_raw_t *axes_raw) {
+int sprint_axes_raw(char *buf, axes_data_uint16_t *axes_raw) {
     return sprintf(buf, "LX=%5d LY=%5d RX=%5d RY=%5d LT=%5d RT=%5d",
             axes_raw->LX, axes_raw->LY,
             axes_raw->RX, axes_raw->RY,
@@ -29,7 +29,7 @@ int sprint_axes_raw(char *buf, axes_raw_t *axes_raw) {
     );
 }
 
-int sprint_axes_scaled(char *buf, axes_t *axes) {
+int sprint_axes_scaled(char *buf, axes_data_double_t *axes) {
     return sprintf(buf, "LX=% 5.2f LY=% 5.2f RX=% 5.2f RY=% 5.2f LT=% 5.2f RT=% 5.2f",
             axes->LX, axes->LY,
             axes->RX, axes->RY,
@@ -60,8 +60,8 @@ int sprint_axis_bar_label(char *buf, char* label, uint16_t axis_raw, int bar_wid
     return strlen(label) + sprint_axis_bar(buf+strlen(label), axis_raw, bar_width);
 }
 
-int sprint_axes_debug(char *buf, axes_raw_t *axes_raw) {
-    axes_t axes = axes_raw_to_scaled(axes_raw);
+int sprint_axes_debug(char *buf, axes_data_uint16_t *axes_raw) {
+    axes_data_double_t axes = axes_uint16_to_double(axes_raw);
     const int BAR_WIDTH = 21;
     int offset = 0;
     offset += sprint_axis_bar_label(buf+offset, "LX: ", axes_raw->LX, BAR_WIDTH) + 2;
@@ -87,8 +87,8 @@ inline void put_axis_addr_sleep(int addr) {
     sleep_us(AXIS_SEL_ADDR_DELAY_US);
 }
 
-axes_raw_t read_axes() {
-    axes_raw_t raw = { 0 };
+axes_data_uint16_t read_axes() {
+    axes_data_uint16_t raw = { 0 };
 
     put_axis_addr_sleep(JOY_LEFT_ADDR);
     adc_select_input(AXIS_X_ADC);

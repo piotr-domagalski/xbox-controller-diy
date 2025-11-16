@@ -42,7 +42,7 @@ void setup() {
 }
 
 void loop() {
-    axes_raw_t axes_raw = read_axes();
+    axes_data_uint16_t axes_raw = read_axes();
 
     uint red = axes_raw.LT>>4;
     uint green = axes_raw.RT>>4;
