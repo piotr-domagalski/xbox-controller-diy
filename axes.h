@@ -21,6 +21,8 @@ typedef struct {
     double RT;
 } axes_data_double_t;
 
+void axes_init();
+
 axes_data_uint16_t read_axes();
 
 axes_data_double_t axes_uint16_to_double(axes_data_uint16_t *axes_raw);

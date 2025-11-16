@@ -10,6 +10,19 @@ inline double _adc_i2d(uint16_t adc);
 void _put_axis_addr(int addr);
 inline void _put_axis_addr_sleep(int addr);
 
+void axes_init() {
+    adc_init();
+    adc_gpio_init(AXIS_X_PIN);
+    adc_gpio_init(AXIS_Y_PIN);
+    adc_select_input(AXIS_X_ADC);
+
+    gpio_init(AXIS_SEL_ADDR_A_PIN);
+    gpio_set_dir(AXIS_SEL_ADDR_A_PIN, true);
+    gpio_init(AXIS_SEL_ADDR_B_PIN);
+    gpio_set_dir(AXIS_SEL_ADDR_B_PIN, true);
+    _put_axis_addr(NOTHING_ADDR);
+}
+
 axes_data_uint16_t read_axes() {
     axes_data_uint16_t raw = { 0 };
 
@@ -45,6 +58,20 @@ axes_data_double_t axes_uint16_to_double(axes_data_uint16_t *axes_raw) {
     axes.LT = _adc_i2d(axes_raw->LT);
     axes.RT = _adc_i2d(axes_raw->RT);
     return axes;
+}
+
+inline double _adc_i2d(uint16_t adc) {
+    return ((double)(adc-(ADC_MAX/2)))/(ADC_MAX/2);
+}
+
+void _put_axis_addr(int addr) {
+    gpio_put(AXIS_SEL_ADDR_A_PIN, 0 != (addr & 1));
+    gpio_put(AXIS_SEL_ADDR_B_PIN, 0 != (addr & 2));
+}
+
+inline void _put_axis_addr_sleep(int addr) {
+    _put_axis_addr(addr);
+    sleep_us(AXIS_SEL_ADDR_DELAY_US);
 }
 
 int sprint_axes_raw(char *buf, axes_data_uint16_t *axes_raw) {
@@ -101,18 +128,4 @@ int sprint_axes_debug(char *buf, axes_data_uint16_t *axes_raw) {
     buf[offset++] = '\n';
     offset += sprint_axes_scaled(buf+offset, &axes);
     return offset;
-}
-
-inline double _adc_i2d(uint16_t adc) {
-    return ((double)(adc-(ADC_MAX/2)))/(ADC_MAX/2);
-}
-
-void _put_axis_addr(int addr) {
-    gpio_put(AXIS_SEL_ADDR_A_PIN, 0 != (addr & 1));
-    gpio_put(AXIS_SEL_ADDR_B_PIN, 0 != (addr & 2));
-}
-
-inline void _put_axis_addr_sleep(int addr) {
-    _put_axis_addr(addr);
-    sleep_us(AXIS_SEL_ADDR_DELAY_US);
 }

@@ -24,17 +24,7 @@ int main() {
 void setup() {
     stdio_init_all();
 
-    adc_init();
-    adc_gpio_init(AXIS_X_PIN);
-    adc_gpio_init(AXIS_Y_PIN);
-    adc_select_input(AXIS_X_ADC);
-
-    gpio_init(AXIS_SEL_ADDR_A_PIN);
-    gpio_set_dir(AXIS_SEL_ADDR_A_PIN, true);
-    gpio_put(AXIS_SEL_ADDR_A_PIN, 0);
-    gpio_init(AXIS_SEL_ADDR_B_PIN);
-    gpio_set_dir(AXIS_SEL_ADDR_B_PIN, true);
-    gpio_put(AXIS_SEL_ADDR_B_PIN, 0);
+    axes_init();
 
     rgb_led_init(&led, LED_RED_PIN, LED_GREEN_PIN, LED_BLUE_PIN);
     rgb_led_set_colour(&led, 150, 200, 100);
