@@ -23,11 +23,7 @@ typedef struct {
 
 axes_data_uint16_t read_axes();
 
-inline double adc_i2d(uint16_t adc);
 axes_data_double_t axes_uint16_to_double(axes_data_uint16_t *axes_raw);
-
-void put_axis_addr(int addr);
-inline void put_axis_addr_sleep(int addr);
 
 int sprint_axes_raw(char *buf, axes_data_uint16_t *axes_raw);
 int sprint_axes_scaled(char *buf, axes_data_double_t *axes);

@@ -6,18 +6,44 @@
 #include "axes.h"
 #include "hardware_config.h"
 
-inline double adc_i2d(uint16_t adc) {
-    return ((double)(adc-(ADC_MAX/2)))/(ADC_MAX/2);
+inline double _adc_i2d(uint16_t adc);
+void _put_axis_addr(int addr);
+inline void _put_axis_addr_sleep(int addr);
+
+axes_data_uint16_t read_axes() {
+    axes_data_uint16_t raw = { 0 };
+
+    _put_axis_addr_sleep(JOY_LEFT_ADDR);
+    adc_select_input(AXIS_X_ADC);
+    raw.LX = adc_read();
+    adc_select_input(AXIS_Y_ADC);
+    raw.LY = adc_read();
+
+    _put_axis_addr_sleep(JOY_RIGHT_ADDR);
+    adc_select_input(AXIS_X_ADC);
+    raw.RX = adc_read();
+    adc_select_input(AXIS_Y_ADC);
+    raw.RY = adc_read();
+
+    _put_axis_addr_sleep(TRIGGERS_ADDR);
+    adc_select_input(AXIS_X_ADC);
+    raw.LT = adc_read();
+    adc_select_input(AXIS_Y_ADC);
+    raw.RT = adc_read();
+
+    _put_axis_addr(NOTHING_ADDR);
+
+    return raw;
 }
 
 axes_data_double_t axes_uint16_to_double(axes_data_uint16_t *axes_raw) {
     axes_data_double_t axes;
-    axes.LX = adc_i2d(axes_raw->LX);
-    axes.LY = adc_i2d(axes_raw->LY);
-    axes.RX = adc_i2d(axes_raw->RX);
-    axes.RY = adc_i2d(axes_raw->RY);
-    axes.LT = adc_i2d(axes_raw->LT);
-    axes.RT = adc_i2d(axes_raw->RT);
+    axes.LX = _adc_i2d(axes_raw->LX);
+    axes.LY = _adc_i2d(axes_raw->LY);
+    axes.RX = _adc_i2d(axes_raw->RX);
+    axes.RY = _adc_i2d(axes_raw->RY);
+    axes.LT = _adc_i2d(axes_raw->LT);
+    axes.RT = _adc_i2d(axes_raw->RT);
     return axes;
 }
 
@@ -77,38 +103,16 @@ int sprint_axes_debug(char *buf, axes_data_uint16_t *axes_raw) {
     return offset;
 }
 
-void put_axis_addr(int addr) {
+inline double _adc_i2d(uint16_t adc) {
+    return ((double)(adc-(ADC_MAX/2)))/(ADC_MAX/2);
+}
+
+void _put_axis_addr(int addr) {
     gpio_put(AXIS_SEL_ADDR_A_PIN, 0 != (addr & 1));
     gpio_put(AXIS_SEL_ADDR_B_PIN, 0 != (addr & 2));
 }
 
-inline void put_axis_addr_sleep(int addr) {
-    put_axis_addr(addr);
+inline void _put_axis_addr_sleep(int addr) {
+    _put_axis_addr(addr);
     sleep_us(AXIS_SEL_ADDR_DELAY_US);
-}
-
-axes_data_uint16_t read_axes() {
-    axes_data_uint16_t raw = { 0 };
-
-    put_axis_addr_sleep(JOY_LEFT_ADDR);
-    adc_select_input(AXIS_X_ADC);
-    raw.LX = adc_read();
-    adc_select_input(AXIS_Y_ADC);
-    raw.LY = adc_read();
-
-    put_axis_addr_sleep(JOY_RIGHT_ADDR);
-    adc_select_input(AXIS_X_ADC);
-    raw.RX = adc_read();
-    adc_select_input(AXIS_Y_ADC);
-    raw.RY = adc_read();
-
-    put_axis_addr_sleep(TRIGGERS_ADDR);
-    adc_select_input(AXIS_X_ADC);
-    raw.LT = adc_read();
-    adc_select_input(AXIS_Y_ADC);
-    raw.RT = adc_read();
-
-    put_axis_addr(NOTHING_ADDR);
-
-    return raw;
 }
